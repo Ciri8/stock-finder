@@ -1,74 +1,86 @@
-# AI Trading Bot with Multi-Agent LangGraph Architecture 🤖📈
+# AI Stock Discovery System with Multi-Agent LangGraph Architecture 🔍📈
 
-An intelligent S&P 500 trading system that combines **5 specialized AI models** orchestrated through **LangChain & LangGraph** to identify high-probability breakout opportunities with explainable decisions.
+An intelligent S&P 500 screening system that combines **5 specialized AI models** orchestrated through **LangChain & LangGraph** to discover high-probability breakout opportunities with explainable analysis. This is a **stock discovery tool**, not an execution bot - it finds the best opportunities and explains why they're worth your attention.
 
 ## 🏗️ System Architecture
 
 ```mermaid
 graph TB
-    subgraph "Data Layer"
-        A[S&P 500 Universe] --> B[yfinance API]
-        C[News API] --> D[Real-time News]
-        B --> E[Market Data Pipeline]
+    subgraph "Daily Data Collection - 6 PM EST"
+        A[S&P 500 Universe<br/>500+ Stocks] --> B[yfinance API]
+        C[News API] --> D[24hr News Feed]
+        B --> E[Market Data Pipeline<br/>OHLCV + Volume]
         D --> E
     end
     
-    subgraph "Filtering & Preprocessing"
-        E --> F[Initial Filter<br/>Volume, Price, Liquidity]
-        F --> G[Technical Indicators<br/>RSI, MACD, BB]
-        G --> H[Feature Engineering<br/>200+ Features]
+    subgraph "Stage 1: High-Speed Filtering"
+        E --> F[Initial Filter<br/>4-8% Weekly Gain<br/>Volume Surge 1.5x]
+        F --> G[Quality Filter<br/>Price > $20<br/>Volume > 1M<br/>Volatility < 15%]
+        G --> H[~50-100 Candidates<br/>From 500 Stocks]
     end
     
-    subgraph "AI Agent Orchestra - LangGraph"
-        H --> I{LangGraph<br/>Orchestrator}
+    subgraph "Stage 2: Technical Analysis"
+        H --> I[Technical Indicators<br/>RSI, MACD, BB<br/>200+ Features]
+        I --> J[Feature Engineering<br/>Normalization<br/>Time Series]
+    end
+    
+    subgraph "Stage 3: AI Analysis Orchestra - LangGraph"
+        J --> K{LangGraph<br/>Orchestrator}
         
-        I --> J[Technical Agent<br/>CNN Pattern Recognition<br/>15 Chart Patterns]
-        I --> K[Quant Agent<br/>LSTM/Transformer<br/>Price Prediction]
-        I --> L[Sentiment Agent<br/>FinBERT/GPT-4<br/>News Analysis]
-        I --> M[Risk Agent<br/>XGBoost<br/>Position Sizing]
-        I --> N[RL Agent<br/>PPO/SAC<br/>Trade Execution]
+        K -->|Parallel| L[Technical Agent<br/>CNN Pattern Recognition<br/>Head & Shoulders, Flags, Triangles]
+        K -->|Parallel| M[Quant Agent<br/>LSTM/Transformer<br/>5-Day Price Forecast]
+        K -->|Parallel| N[Sentiment Agent<br/>FinBERT<br/>News Sentiment Score]
+        K -->|Parallel| O[Risk Agent<br/>XGBoost<br/>Risk Score & Volatility]
         
-        J --> O[Signal<br/>Aggregator]
-        K --> O
-        L --> O
-        M --> O
-        N --> O
+        L --> P[Signal<br/>Aggregator<br/>Weighted Scoring]
+        M --> P
+        N --> P
+        O --> P
     end
     
-    subgraph "Decision & Execution"
-        O --> P{Risk<br/>Gateway}
-        P -->|Low Risk| Q[Auto Execute]
-        P -->|High Risk| R[Human Review]
-        Q --> S[Broker API]
-        R --> S
+    subgraph "Stage 4: Stock Discovery Output"
+        P --> Q[Ranking Engine<br/>Score 0-100]
+        Q --> R[Top 10-20<br/>Breakout Candidates]
+        R --> S[Natural Language<br/>Explanations]
     end
     
-    subgraph "Monitoring & Reporting"
-        S --> T[Performance Tracker]
-        T --> U[PDF Reports]
-        T --> V[Plotly Dashboard]
-        T --> W[Slack/Email Alerts]
+    subgraph "Stage 5: Report Generation"
+        S --> T[PDF Report<br/>Entry Points<br/>Stop Loss<br/>Targets]
+        S --> U[CSV Export<br/>Ranked List]
+        S --> V[Dashboard<br/>Visualization]
+        S --> W[Email/Slack<br/>Daily Alert]
     end
     
-    style I fill:#f9f,stroke:#333,stroke-width:4px
-    style O fill:#bbf,stroke:#333,stroke-width:2px
-    style P fill:#fbb,stroke:#333,stroke-width:2px
+    style K fill:#f9f,stroke:#333,stroke-width:4px
+    style P fill:#bbf,stroke:#333,stroke-width:2px
+    style R fill:#5f5,stroke:#333,stroke-width:3px
 ```
 
 ## 🎯 What This Project Really Is
 
-This isn't just another trading bot. It's a **multi-agent AI system** that mimics how a team of expert analysts would collaborate to find the next breakout stocks. Each AI agent specializes in different market analysis aspects, working together through LangGraph orchestration.
+This is an **AI-powered stock screener** that discovers breakout opportunities in the S&P 500 before they happen. Think of it as your personal team of analysts working 24/7 to find the next big movers.
 
-### The Vision
+### What It Does
+Every day at 6 PM EST, the system:
+1. **Scans all 500+ S&P 500 stocks** in under 30 seconds
+2. **Filters for momentum** - finds stocks gaining 4-8% with volume surges
+3. **Analyzes with 5 AI models** working in parallel
+4. **Ranks opportunities** from 0-100 based on breakout probability
+5. **Delivers a report** with the top 10-20 stocks and explanations
 
-Imagine having:
-- A **Technical Analyst** who spots chart patterns and volume surges
-- A **Quant Analyst** who predicts price movements with deep learning
-- A **News Analyst** who gauges market sentiment from headlines
-- A **Risk Manager** who calculates optimal position sizes
-- A **Portfolio Manager** who makes final buy/sell decisions
+### What It Doesn't Do
+- ❌ **No automated trading** - This finds opportunities, you make the trades
+- ❌ **No broker integration** - Purely a discovery and analysis tool
+- ❌ **No position management** - Focus is on finding entries, not exits
 
-This system brings that team to life through AI agents that communicate, reason, and explain their decisions in natural language.
+### The AI Team Working For You
+- **Technical Analyst Agent** - Spots chart patterns and volume anomalies
+- **Quant Analyst Agent** - Predicts 5-day price movements with deep learning
+- **News Analyst Agent** - Gauges market sentiment from headlines
+- **Risk Analyst Agent** - Calculates volatility and risk scores
+- **Synthesis Agent** - Combines all analyses into actionable insights
+
+Each agent explains its reasoning in plain English, so you understand not just *what* to look at, but *why*.
 
 ## 🚀 Key Features
 
@@ -251,15 +263,15 @@ And avoids:
   - Feature importance shows which risks matter most
   - 87% accuracy in predicting drawdowns >5%
 
-### 5. **PPO for Reinforcement Learning Trading**
-**Method**: Proximal Policy Optimization with custom reward
-- **State Space**: Technical indicators, predictions, sentiment, risk
-- **Action Space**: Buy/Sell/Hold with position sizing
-- **Reward**: Sharpe ratio + drawdown penalty
-- **Why PPO?**:
-  - More stable than DQN/A3C in volatile markets
-  - Learns to adapt strategy to market regimes
-  - 22% better risk-adjusted returns than rule-based systems
+### 5. **Ensemble Scoring for Final Ranking**
+**Method**: Weighted ensemble with confidence calibration
+- **Inputs**: All model outputs (patterns, predictions, sentiment, risk)
+- **Weights**: Dynamically adjusted based on market regime
+- **Output**: Final score 0-100 with confidence intervals
+- **Why Ensemble?**:
+  - Reduces false positives by requiring multiple confirmations
+  - More robust than any single model
+  - Provides confidence scores for position sizing
 
 ### 6. **LangGraph for Orchestration**
 **Method**: Graph-based agent coordination
