@@ -1,0 +1,14 @@
+name: ai_trading_bot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - jupyter
+  - ipykernel
+  - pip:
+    - -r requirements.txt
