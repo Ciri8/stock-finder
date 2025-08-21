@@ -27,3 +27,8 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+IMPLEMENTATION.md
+ISSUES.md
+GITHUB_ISSUES.md
+IMPLEMENTATION_GUIDE.md
+environment.yml
