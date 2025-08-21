@@ -84,33 +84,35 @@ Each agent explains its reasoning in plain English, so you understand not just *
 
 ## 🚀 Key Features
 
-### 1. **Smart Stock Filtering**
-- Scans 500+ S&P 500 stocks in under 30 seconds
-- Identifies stocks with 4-8% weekly momentum
-- Detects volume surges (institutional accumulation)
-- Filters for quality (liquidity, price range, volatility)
+### 1. **Multi-Stage Filtering Pipeline**
+- Stage 1: 500 → 50 stocks (technical filter)
+- Stage 2: 50 → 20 stocks (AI analysis)
+- Stage 3: 20 → 10 stocks (scoring)
+- Stage 4: 10 → 5 stocks (LLM deep dive)
 
-### 2. **Multi-Agent AI Pipeline**
-- **CNN Pattern Recognition**: Detects 15+ chart patterns
-- **LSTM Price Predictor**: 5-day forecasting with 2.3% RMSE
-- **FinBERT Sentiment**: Analyzes news with 92% accuracy
-- **XGBoost Risk Model**: Position sizing and risk scoring
-- **RL Trading Agent**: Final buy/sell decisions with PPO
+### 2. **5 Specialized AI Models**
+- **CNN Pattern Recognition**: Detects breakout patterns (flags, triangles, etc.)
+- **LSTM Momentum Predictor**: Forecasts if rally will continue
+- **FinBERT Sentiment**: Identifies news catalysts
+- **XGBoost Risk Scorer**: Assesses opportunity quality
+- **Ollama LLM Analyst**: Provides final human-like analysis
 
 ### 3. **LangGraph Orchestration**
-- Parallel agent processing
-- State management across workflows
-- Human-in-the-loop for high-risk trades
-- Natural language explanations for every decision
+- Parallel processing of all models
+- Combines insights from multiple agents
+- Natural language explanations
+- Full analysis in under 5 minutes
 
 ## 💻 Tech Stack
 
 - **Python 3.11** with async support
-- **LangChain & LangGraph** for orchestration
-- **PyTorch 2.0** (CUDA optimized for RTX 3080 Ti)
-- **yfinance** for market data
+- **LangChain & LangGraph** for agent orchestration
+- **Ollama** for local LLM analysis (free, no API needed)
+- **PyTorch 2.0** with CUDA for deep learning
+- **yfinance** for free market data
 - **TA-Lib** for technical indicators
-- **ChromaDB/FAISS** for vector storage
+- **FinBERT** for sentiment analysis
+- **NewsAPI** for news headlines (free tier)
 
 ## 🔧 Installation
 
@@ -145,7 +147,12 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your API keys (NewsAPI required for sentiment)
 
-# 7. Verify installation
+# 7. Install Ollama (for LLM analysis)
+# Download from: https://ollama.ai
+# Then pull a model:
+ollama pull llama2  # or mistral, phi, etc.
+
+# 8. Verify installation
 python test_setup.py
 ```
 
@@ -193,19 +200,30 @@ for stock in breakouts[:5]:
 
 ## 📊 How The System Works
 
-### Data Flow
+### The Discovery Pipeline
 ```
-1. Data Collection (6 PM Daily)
+Stage 1: Technical Filter (500 → 50 stocks)
+  ├─ 4-8% weekly gain with volume surge
+  └─ Quality filters (price, liquidity, volatility)
    ↓
-2. Initial Filtering (Volume & Price)
+Stage 2: AI Models Analysis (50 → 20 stocks)
+  ├─ CNN: Chart pattern detection
+  ├─ LSTM: Price momentum prediction
+  └─ FinBERT: News sentiment analysis
    ↓
-3. AI Analysis (5 Models in Parallel)
+Stage 3: Combined Scoring (20 → 10 stocks)
+  ├─ Weighted ensemble of all signals
+  └─ Risk-adjusted opportunity score (0-100)
    ↓
-4. Signal Generation (LangGraph)
+Stage 4: LLM Deep Dive (10 → 5 stocks)
+  ├─ Ollama analyzes with full context
+  ├─ Bull/bear case generation
+  └─ Entry point suggestions
    ↓
-5. Risk Assessment & Position Sizing
-   ↓
-6. PDF Report Generation
+Final Output: Top 5 Discoveries
+  ├─ PDF report with charts
+  ├─ Natural language explanations
+  └─ Risk warnings & confidence scores
 ```
 
 ### Filtering Logic
@@ -263,15 +281,16 @@ And avoids:
   - Feature importance shows which risks matter most
   - 87% accuracy in predicting drawdowns >5%
 
-### 5. **Ensemble Scoring for Final Ranking**
-**Method**: Weighted ensemble with confidence calibration
-- **Inputs**: All model outputs (patterns, predictions, sentiment, risk)
-- **Weights**: Dynamically adjusted based on market regime
-- **Output**: Final score 0-100 with confidence intervals
-- **Why Ensemble?**:
-  - Reduces false positives by requiring multiple confirmations
-  - More robust than any single model
-  - Provides confidence scores for position sizing
+### 5. **Ollama LLM for Final Analysis**
+**Method**: Local LLM for deep analysis of top candidates
+- **Model**: Llama2/Mistral running locally via Ollama
+- **Inputs**: Technical indicators, AI predictions, news, patterns
+- **Output**: Natural language analysis with bull/bear cases
+- **Why Ollama?**:
+  - 100% free and runs locally (no API costs)
+  - Private - your data never leaves your machine
+  - Can be fine-tuned on your successful discoveries
+  - Provides human-readable explanations
 
 ### 6. **LangGraph for Orchestration**
 **Method**: Graph-based agent coordination
@@ -396,33 +415,38 @@ And avoids:
 
 ## 🗺️ Project Roadmap
 
-### ✅ Phase 1: Foundation (Complete)
+### ✅ Phase 1: Foundation (COMPLETE)
 - [x] S&P 500 data pipeline with async fetching
 - [x] High-performance stock filtering (<30s for 500 stocks)
-- [x] Technical indicator calculation engine
-- [x] Caching layer for API optimization
+- [x] Configuration system with validation
+- [x] Breakout filter with 3 modes (STRICT/NORMAL/LOOSE)
 
-### 🚧 Phase 2: AI Models (In Progress - 60% Complete)
-- [x] Feature engineering pipeline (200+ features)
-- [x] Data preprocessing & normalization
-- [ ] CNN pattern recognition training
-- [ ] LSTM price prediction implementation
-- [ ] FinBERT fine-tuning on financial corpus
-- [ ] XGBoost risk model calibration
+### 🚧 Phase 2: Core Analysis (Week 3-4)
+- [ ] **Issue #5**: Technical indicators (RSI, MACD, Bollinger Bands)
+- [ ] **Issue #6**: Feature engineering (200+ features)
+- [ ] **Issue #7**: CNN pattern recognition (flags, triangles, breakouts)
+- [ ] **Issue #8**: LSTM price prediction (5-day momentum forecast)
 
-### 📅 Phase 3: Orchestration (Q1 2025)
-- [ ] LangGraph agent framework setup
-- [ ] Inter-agent communication protocol
-- [ ] Consensus mechanism for signals
-- [ ] Natural language explanation generator
-- [ ] Human-in-the-loop interface
+### 🎯 Phase 3: Intelligence Layer (Week 5-6)
+- [ ] **Issue #9**: News sentiment analysis with FinBERT
+- [ ] **Issue #10**: Opportunity scoring model (0-100 ranking)
+- [ ] **Issue #11**: Multi-stage ranking (500→50→20→10→5 stocks)
+- [ ] **Issue #12**: LLM analysis with Ollama (deep dive on top 5)
+- [ ] **Issue #13**: LangGraph orchestration (parallel agent processing)
+- [ ] **Issue #14**: Report generation (PDF with charts & analysis)
 
-### 🎯 Phase 4: Production (Q2 2025)
-- [ ] Interactive Brokers API integration
-- [ ] AWS/GCP deployment with auto-scaling
-- [ ] Real-time WebSocket data feeds
-- [ ] Slack/Discord/Telegram alerts
-- [ ] Web dashboard with Streamlit
+### 📅 Phase 4: Enhancement (Week 7-8)
+- [ ] **Issue #15**: Discovery performance validator
+- [ ] **Issue #16**: Daily scheduler (6 PM automation)
+- [ ] **Issue #17**: Market regime detection
+- [ ] **Issue #18**: Ollama fine-tuning pipeline
+
+### 🔮 Phase 5: Advanced Features (Optional)
+- [ ] Web dashboard for discoveries
+- [ ] Fundamental analysis integration
+- [ ] Discord/Slack notifications
+- [ ] RAG knowledge base
+- [ ] Options flow analysis
 
 ## 🤝 Contributing
 
