@@ -16,7 +16,7 @@ def test_filter_modes():
     print("="*60)
     
     # Test with 30 stocks for speed
-    test_limit = 30
+    test_limit = 500
     
     modes = ["strict", "normal", "loose"]
     
