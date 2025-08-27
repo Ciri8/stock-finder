@@ -4,9 +4,12 @@ Test single stock data fetching to diagnose issues
 
 import sys
 import os
-sys.path.append('src')
+from pathlib import Path
 
-from data_pipeline.fetcher import StockDataFetcher
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.data_pipeline.fetcher import StockDataFetcher
 import yfinance as yf
 import time
 

@@ -1,0 +1,134 @@
+# Pattern Recognition Model Training Configuration
+
+# Data Generation Settings
+data_generation:
+  samples_per_pattern: 200  # Number of samples to generate per pattern type
+  window_size: 60          # Number of days in each window
+  noise_levels: [0.01, 0.02, 0.03, 0.04]  # Different noise levels for variety
+  patterns:
+    - no_pattern
+    - bull_flag
+    - bear_flag
+    - ascending_triangle
+    - descending_triangle
+    - cup_and_handle
+    - inverse_head_shoulders
+    - head_shoulders
+    - double_top
+    - double_bottom
+    - wedge
+
+# Model Architecture
+model:
+  input_channels: 3  # RGB image channels
+  num_patterns: 12   # Number of pattern classes
+  dropout_rate: 0.3  # Dropout for regularization
+  
+  # CNN layers configuration
+  conv_layers:
+    - {filters: 32, kernel: 3, padding: 1}
+    - {filters: 64, kernel: 3, padding: 1}
+    - {filters: 128, kernel: 3, padding: 1}
+    - {filters: 256, kernel: 3, padding: 1}
+  
+  # Fully connected layers
+  fc_layers:
+    - 512
+    - 256
+
+# Training Parameters
+training:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 0.001
+  weight_decay: 0.0001  # L2 regularization
+  
+  # Learning rate scheduler
+  scheduler:
+    type: "ReduceLROnPlateau"
+    mode: "min"
+    patience: 5
+    factor: 0.5
+    min_lr: 0.00001
+  
+  # Early stopping
+  early_stopping:
+    patience: 10
+    min_delta: 0.001
+  
+  # Data split ratios
+  split_ratios:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+
+# Augmentation Settings (for training robustness)
+augmentation:
+  enable: true
+  horizontal_flip: false  # Don't flip time series
+  vertical_flip: false
+  rotation_range: 5  # Small rotations only
+  zoom_range: 0.1
+  brightness_range: [0.9, 1.1]
+  noise_injection: 0.01
+
+# Evaluation Settings
+evaluation:
+  confidence_thresholds: [0.3, 0.5, 0.7, 0.9]
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1_score
+    - confusion_matrix
+  
+  # Real market testing
+  test_tickers: ["AAPL", "MSFT", "GOOGL", "NVDA", "TSLA", "SPY", "QQQ"]
+  test_period: "6mo"
+
+# Output Settings
+output:
+  model_dir: "data/models"
+  checkpoint_dir: "data/checkpoints"
+  log_dir: "data/logs"
+  visualization_dir: "data/visualizations"
+  
+  # Model naming
+  model_name_format: "pattern_model_{timestamp}.pth"
+  best_model_name: "best_pattern_model.pth"
+  
+  # Logging
+  tensorboard: true
+  save_frequency: 5  # Save checkpoint every N epochs
+
+# Hardware Settings
+hardware:
+  device: "auto"  # auto, cuda, cpu
+  num_workers: 4  # DataLoader workers
+  pin_memory: true  # For CUDA optimization
+  mixed_precision: false  # Use AMP for faster training
+
+# Hyperparameter Search (optional)
+hyperparameter_search:
+  enable: false
+  trials: 20
+  parameters:
+    learning_rate: [0.0001, 0.001, 0.01]
+    batch_size: [16, 32, 64]
+    dropout_rate: [0.2, 0.3, 0.4, 0.5]
+    optimizer: ["adam", "sgd", "rmsprop"]
+
+# Production Settings
+production:
+  confidence_threshold: 0.6  # Minimum confidence for production predictions
+  ensemble_models: 3  # Number of models to ensemble
+  update_frequency: "monthly"  # How often to retrain
+  
+  # Risk management
+  max_patterns_per_stock: 3  # Maximum patterns to report per stock
+  require_confirmation: true  # Require multiple timeframe confirmation
+  
+  # Performance tracking
+  track_predictions: true
+  prediction_log: "data/predictions.csv"
+  performance_metrics_window: 30  # Days to evaluate performance

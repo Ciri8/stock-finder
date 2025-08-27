@@ -3,11 +3,13 @@ Test the consolidated breakout filter
 """
 
 import sys
-sys.path.append('src')
+import os
+# Add parent directory to path since we're now in tests folder
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from screening.breakout_filter import find_breakouts, FilterCriteria, BreakoutFilter
-from data_pipeline.fetcher import StockDataFetcher
-from data_pipeline.sp500_scraper import SP500Scraper
+from src.screening.breakout_filter import find_breakouts, FilterCriteria, BreakoutFilter
+from src.data_pipeline.fetcher import StockDataFetcher
+from src.data_pipeline.sp500_scraper import SP500Scraper
 
 def test_filter_modes():
     """Test different filter modes"""

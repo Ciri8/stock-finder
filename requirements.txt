@@ -18,6 +18,10 @@ transformers==4.31.0
 # Technical Analysis
 vectorbt==0.26.0
 backtrader==1.9.78.123
+mplfinance==0.12.10b0
+TA-Lib==0.4.28
+opencv-python==4.8.1.78
+Pillow==10.0.0
 
 # NLP
 newsapi-python==0.2.6

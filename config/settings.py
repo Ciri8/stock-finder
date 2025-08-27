@@ -1,6 +1,8 @@
 """
 Configuration management system for AI Stock Discovery System.
 Handles all settings, API keys, and trading parameters with validation.
+
+right now breakout_filter.py is working just fine with hardcoded settings but later i will switch to this.
 """
 
 import os

@@ -530,54 +530,74 @@ class TechnicalAnalyzer:
     
     def get_bullish_signals(self, indicators: TechnicalIndicators) -> List[str]:
         """
-        Identify bullish signals from technical indicators.
+        Identify BREAKOUT bullish signals from technical indicators.
+        Optimized for momentum/breakout detection, not oversold bounces.
         
         Args:
             indicators: TechnicalIndicators object
             
         Returns:
-            List of bullish signals found
+            List of breakout bullish signals found
         """
         signals = []
         
-        # RSI oversold
-        if indicators.rsi_signal == 'oversold':
-            signals.append('RSI_OVERSOLD')
+        # RSI momentum (not oversold) - BREAKOUT OPTIMIZED
+        if indicators.rsi and 50 <= indicators.rsi <= 70:
+            signals.append('RSI_MOMENTUM')
+        elif indicators.rsi and indicators.rsi > 70:
+            signals.append('RSI_STRONG_MOMENTUM')
         
-        # MACD bullish crossover
+        # MACD bullish crossover - UNCHANGED
         if indicators.macd_crossover == 'bullish':
             signals.append('MACD_BULLISH_CROSS')
         
-        # Price near lower Bollinger Band
-        if indicators.bb_signal in ['near_lower', 'below_lower']:
-            signals.append('BB_OVERSOLD')
+        # Price near UPPER Bollinger Band - BREAKOUT OPTIMIZED
+        if indicators.bb_signal in ['near_upper', 'above_upper']:
+            signals.append('BB_BREAKOUT')
         
-        # Bollinger Band squeeze (potential breakout)
+        # Bollinger Band squeeze - UNCHANGED
         if indicators.bb_signal == 'squeeze':
             signals.append('BB_SQUEEZE')
         
-        # Strong trend (ADX > 25)
-        if indicators.adx and indicators.adx > self.adx_trend_threshold:
-            signals.append('STRONG_TREND')
+        # Strong trend - ENHANCED
+        if indicators.adx:
+            if indicators.adx > 30:
+                signals.append('VERY_STRONG_TREND')
+            elif indicators.adx > self.adx_trend_threshold:
+                signals.append('STRONG_TREND')
         
-        # Volume surge
-        if indicators.volume_ratio and indicators.volume_ratio > 1.5:
-            signals.append('VOLUME_SURGE')
+        # Volume surge - ENHANCED
+        if indicators.volume_ratio:
+            if indicators.volume_ratio > 2.0:
+                signals.append('MAJOR_VOLUME_SURGE')
+            elif indicators.volume_ratio > 1.5:
+                signals.append('VOLUME_SURGE')
         
-        # Stochastic oversold
-        if indicators.stochastic_k and indicators.stochastic_k < 20:
-            signals.append('STOCH_OVERSOLD')
+        # Stochastic momentum - BREAKOUT OPTIMIZED
+        if indicators.stochastic_k and 40 <= indicators.stochastic_k <= 80:
+            signals.append('STOCH_MOMENTUM')
         
-        # Price above key moving averages
-        if (indicators.sma_20 and indicators.sma_50 and 
-            indicators.sma_20 > indicators.sma_50):
-            signals.append('MA_BULLISH_ALIGNMENT')
+        # Price above key moving averages - ENHANCED
+        if indicators.sma_20 and indicators.sma_50 and indicators.sma_200:
+            if indicators.sma_20 > indicators.sma_50 > indicators.sma_200:
+                signals.append('MA_PERFECT_ALIGNMENT')
+            elif indicators.sma_20 > indicators.sma_50:
+                signals.append('MA_BULLISH_ALIGNMENT')
+        
+        # Additional breakout signals
+        if indicators.bb_percent and indicators.bb_percent > 0.8:
+            signals.append('APPROACHING_BREAKOUT')
+        
+        if indicators.macd and indicators.macd_signal:
+            if indicators.macd > indicators.macd_signal and indicators.macd > 0:
+                signals.append('MACD_ABOVE_ZERO')
         
         return signals
     
     def score_stock(self, indicators: TechnicalIndicators) -> float:
         """
-        Calculate a technical score for the stock (0-100).
+        Calculate a technical score for BREAKOUT stocks (0-100).
+        Optimized for momentum/breakout detection, not mean reversion.
         
         Args:
             indicators: TechnicalIndicators object
@@ -587,61 +607,83 @@ class TechnicalAnalyzer:
         """
         score = 50  # Start with neutral score
         
-        # RSI scoring
+        # RSI scoring - BREAKOUT OPTIMIZED
+        # Breakout stocks typically have RSI 50-70 (momentum without exhaustion)
         if indicators.rsi is not None:
-            if indicators.rsi < 30:
-                score += 10  # Oversold is bullish
-            elif indicators.rsi > 70:
-                score -= 10  # Overbought is bearish
-            else:
-                # Neutral RSI, slight bonus for 40-60 range
-                if 40 <= indicators.rsi <= 60:
-                    score += 5
+            if 50 <= indicators.rsi <= 65:
+                score += 15  # Perfect breakout momentum zone
+            elif 65 < indicators.rsi <= 75:
+                score += 5   # Still good but watch for exhaustion
+            elif indicators.rsi > 75:
+                score -= 10  # Too overbought, pullback risk
+            elif indicators.rsi < 40:
+                score -= 10  # Too weak for breakouts
+            elif 40 <= indicators.rsi < 50:
+                score += 0   # Building momentum, neutral
         
-        # MACD scoring
+        # MACD scoring - UNCHANGED (already good)
         if indicators.macd_crossover:
             if indicators.macd_crossover == 'bullish':
-                score += 15
+                score += 15  # Bullish momentum building
             elif indicators.macd_crossover == 'bearish':
-                score -= 15
+                score -= 15  # Momentum fading
         
-        # Bollinger Bands scoring
+        # Bollinger Bands - BREAKOUT OPTIMIZED
+        # Breakouts happen near upper band or during squeeze
         if indicators.bb_percent is not None:
-            if indicators.bb_percent < 0.2:
-                score += 10  # Near lower band
-            elif indicators.bb_percent > 0.8:
-                score -= 5  # Near upper band
+            if 0.6 <= indicators.bb_percent <= 0.9:
+                score += 10  # Moving toward upper band (breakout zone)
+            elif indicators.bb_percent > 0.9:
+                score += 5   # At upper band (potential breakout)
+            elif indicators.bb_percent > 1.0:
+                score += 8   # Above upper band (breakout confirmed)
+            elif indicators.bb_percent < 0.3:
+                score -= 10  # Too far from breakout zone
             
             if indicators.bb_signal == 'squeeze':
-                score += 5  # Potential breakout
+                score += 10  # Bollinger squeeze = potential big move
+            elif indicators.bb_signal == 'above_upper':
+                score += 5   # Breaking out of bands
         
-        # Trend strength scoring (ADX)
+        # Trend strength - ENHANCED
         if indicators.adx is not None:
-            if indicators.adx > 25:
+            if indicators.adx > 30:
+                score += 15  # Very strong trend (breakout characteristic)
+            elif 25 <= indicators.adx <= 30:
                 score += 10  # Strong trend
+            elif 20 <= indicators.adx < 25:
+                score += 5   # Moderate trend
             elif indicators.adx < 20:
-                score -= 5  # Weak trend
+                score -= 5   # Weak/no trend
         
-        # Volume scoring
+        # Volume scoring - ENHANCED FOR BREAKOUTS
         if indicators.volume_ratio is not None:
-            if indicators.volume_ratio > 1.5:
-                score += 10  # High volume
-            elif indicators.volume_ratio < 0.5:
-                score -= 10  # Low volume
+            if indicators.volume_ratio > 2.0:
+                score += 15  # Major volume surge (institutional buying)
+            elif 1.5 <= indicators.volume_ratio <= 2.0:
+                score += 10  # Strong volume
+            elif 1.2 <= indicators.volume_ratio < 1.5:
+                score += 5   # Above average volume
+            elif indicators.volume_ratio < 0.8:
+                score -= 10  # Low volume (no conviction)
         
-        # Moving average alignment
+        # Moving average alignment - UNCHANGED (already good)
         if indicators.sma_20 and indicators.sma_50 and indicators.sma_200:
             if indicators.sma_20 > indicators.sma_50 > indicators.sma_200:
-                score += 15  # Bullish alignment
+                score += 15  # Perfect bullish alignment
+            elif indicators.sma_20 > indicators.sma_50:
+                score += 8   # Short-term bullish
             elif indicators.sma_20 < indicators.sma_50 < indicators.sma_200:
                 score -= 15  # Bearish alignment
         
-        # Stochastic scoring
+        # Stochastic - BREAKOUT OPTIMIZED
         if indicators.stochastic_k is not None:
-            if indicators.stochastic_k < 20:
-                score += 5  # Oversold
+            if 40 <= indicators.stochastic_k <= 80:
+                score += 5   # Healthy momentum zone
             elif indicators.stochastic_k > 80:
-                score -= 5  # Overbought
+                score -= 5   # Overbought
+            elif indicators.stochastic_k < 20:
+                score -= 10  # Too oversold for breakouts
         
         # Ensure score stays within 0-100
         return max(0, min(100, score))

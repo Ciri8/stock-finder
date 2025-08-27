@@ -5,7 +5,10 @@ Tests RSI, MACD, Bollinger Bands and other indicators with real market data.
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.screening.technical_indicators import TechnicalAnalyzer, TechnicalIndicators
 from src.data_pipeline.fetcher import StockDataFetcher

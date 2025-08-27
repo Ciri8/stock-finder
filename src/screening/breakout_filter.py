@@ -1,8 +1,17 @@
 """
+
+test file:
+test_breakout_filter.py
+
 Breakout Stock Filter - Complete Implementation
 Finds high-quality breakout candidates from S&P 500 stocks
 
 This is the ONLY filter file you need - combines all filtering logic
+     Finds stocks with:
+     - 3-8% weekly gain
+     - Volume surge (1.5x average)
+     - Price > $20
+     - Volume > 1M daily
 
 Key Features:
 

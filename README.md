@@ -7,27 +7,27 @@ An intelligent S&P 500 screening system that combines **5 specialized AI models*
 ```mermaid
 graph TB
     subgraph "Daily Data Collection - 6 PM EST"
-        A[S&P 500 Universe<br/>500+ Stocks] --> B[yfinance API]
+        A[S&P 500 Universe<br/>500+ Stocks] --> B[yfinance API<br/>with Smart Caching]
         C[News API] --> D[24hr News Feed]
         B --> E[Market Data Pipeline<br/>OHLCV + Volume]
         D --> E
     end
     
     subgraph "Stage 1: High-Speed Filtering"
-        E --> F[Initial Filter<br/>4-8% Weekly Gain<br/>Volume Surge 1.5x]
+        E --> F[Breakout Filter<br/>3 Modes: STRICT/NORMAL/LOOSE<br/>Volume Surge 1.2x+]
         F --> G[Quality Filter<br/>Price > $20<br/>Volume > 1M<br/>Volatility < 15%]
-        G --> H[~50-100 Candidates<br/>From 500 Stocks]
+        G --> H[~50-100 Candidates<br/>Graded A+ to C]
     end
     
     subgraph "Stage 2: Technical Analysis"
-        H --> I[Technical Indicators<br/>RSI, MACD, BB<br/>200+ Features]
-        I --> J[Feature Engineering<br/>Normalization<br/>Time Series]
+        H --> I[Technical Indicators<br/>RSI, MACD, BB, ADX<br/>Support/Resistance]
+        I --> J[Feature Engineering<br/>200+ Features<br/>Normalization]
     end
     
     subgraph "Stage 3: AI Analysis Orchestra - LangGraph"
         J --> K{LangGraph<br/>Orchestrator}
         
-        K -->|Parallel| L[Technical Agent<br/>CNN Pattern Recognition<br/>Head & Shoulders, Flags, Triangles]
+        K -->|Parallel| L[Pattern Agent<br/>CNN Recognition<br/>Bull Flag, Cup & Handle]
         K -->|Parallel| M[Quant Agent<br/>LSTM/Transformer<br/>5-Day Price Forecast]
         K -->|Parallel| N[Sentiment Agent<br/>FinBERT<br/>News Sentiment Score]
         K -->|Parallel| O[Risk Agent<br/>XGBoost<br/>Risk Score & Volatility]
@@ -156,46 +156,42 @@ ollama pull llama2  # or mistral, phi, etc.
 python test_setup.py
 ```
 
+
 ## 🎮 Usage
 
 ### Basic Commands
 
 ```bash
-# Test data pipeline
-python test_data_pipeline.py
+# Train pattern recognition model
+python train_with_real_data.py
 
-# Run stock filter (finds breakout candidates)
-python test_filter.py
+# Find breakout stocks
+python debug_filter.py
 
-# Production filter (stricter criteria)
-python test_production_filter.py
+# Test technical indicators
+python test_breakout.py
 
-# Full system test (coming soon)
-python src/main.py --scan
+# Run all tests
+python run_all_tests.py
+
+# Run specific test suite
+pytest tests/test_pattern_recognition.py -v
 ```
 
 ### Example: Finding Breakout Stocks
 
 ```python
-from src.screening.initial_filter import InitialStockFilter, FilterCriteria
-from src.data_pipeline.fetcher import StockDataFetcher
-from src.data_pipeline.sp500_scraper import SP500Scraper
+from src.screening.breakout_filter import BreakoutFilter, FilterCriteria
 
-# Initialize components
-fetcher = StockDataFetcher()
-scraper = SP500Scraper()
-filter = InitialStockFilter(fetcher)
+# Initialize filter
+filter = BreakoutFilter()
 
-# Get S&P 500 stocks
-tickers = scraper.fetch_sp500_tickers()
-
-# Filter for breakouts
-breakouts = filter.filter_stocks(tickers[:100])  # Test with first 100
+# Find breakouts with NORMAL criteria (balanced approach)
+results = filter.filter_sp500_stocks(criteria=FilterCriteria.NORMAL)
 
 # Display top candidates
-for stock in breakouts[:5]:
-    print(f"{stock.ticker}: {stock.weekly_change:.1%} gain, "
-          f"Volume: {stock.volume_ratio:.1f}x average")
+for stock in results[:5]:
+    print(f"{stock.ticker}: Grade {stock.grade}, Score {stock.score}/100")
 ```
 
 ## 📊 How The System Works
@@ -421,27 +417,31 @@ And avoids:
 - [x] Configuration system with validation
 - [x] Breakout filter with 3 modes (STRICT/NORMAL/LOOSE)
 
-### 🚧 Phase 2: Core Analysis (Week 3-4)
-- [ ] **Issue #5**: Technical indicators (RSI, MACD, Bollinger Bands)
-- [ ] **Issue #6**: Feature engineering (200+ features)
-- [ ] **Issue #7**: CNN pattern recognition (flags, triangles, breakouts)
-- [ ] **Issue #8**: LSTM price prediction (5-day momentum forecast)
+### ✅ Phase 2: Core Analysis (COMPLETE)
+- [x] **Issue #3**: Technical indicators (RSI, MACD, Bollinger Bands)
+- [x] **Issue #5**: Feature engineering (200+ features)
+- [x] Pattern recognition CNN implementation
+- [x] Data preprocessing pipeline
 
-### 🎯 Phase 3: Intelligence Layer (Week 5-6)
+### 🚧 Phase 3: Intelligence Layer (In Progress)
+- [x] **Issue #7**: CNN pattern recognition training
+- [ ] **Issue #8**: LSTM price prediction (5-day momentum forecast)
 - [ ] **Issue #9**: News sentiment analysis with FinBERT
 - [ ] **Issue #10**: Opportunity scoring model (0-100 ranking)
+
+### 🎯 Phase 4: Integration (Week 5-6)
 - [ ] **Issue #11**: Multi-stage ranking (500→50→20→10→5 stocks)
 - [ ] **Issue #12**: LLM analysis with Ollama (deep dive on top 5)
 - [ ] **Issue #13**: LangGraph orchestration (parallel agent processing)
 - [ ] **Issue #14**: Report generation (PDF with charts & analysis)
 
-### 📅 Phase 4: Enhancement (Week 7-8)
+### 📅 Phase 5: Enhancement (Week 7-8)
 - [ ] **Issue #15**: Discovery performance validator
 - [ ] **Issue #16**: Daily scheduler (6 PM automation)
 - [ ] **Issue #17**: Market regime detection
 - [ ] **Issue #18**: Ollama fine-tuning pipeline
 
-### 🔮 Phase 5: Advanced Features (Optional)
+### 🔮 Phase 6: Advanced Features (Optional)
 - [ ] Web dashboard for discoveries
 - [ ] Fundamental analysis integration
 - [ ] Discord/Slack notifications

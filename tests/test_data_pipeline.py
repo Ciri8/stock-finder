@@ -4,10 +4,13 @@ Test the data pipeline components
 
 import sys
 import os
-sys.path.append('src')
+from pathlib import Path
 
-from data_pipeline.sp500_scraper import SP500Scraper
-from data_pipeline.fetcher import StockDataFetcher
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.data_pipeline.sp500_scraper import SP500Scraper
+from src.data_pipeline.fetcher import StockDataFetcher
 import random
 import pandas as pd
 
