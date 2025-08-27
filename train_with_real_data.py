@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 import yfinance as yf
 from datetime import datetime, timedelta
@@ -22,7 +23,8 @@ warnings.filterwarnings('ignore')
 
 from src.pattern_rec.pattern_recognition import (
     ChartPatternRecognizer, 
-    ChartPatternDataset
+    ChartPatternDataset,
+    PatternCNN
 )
 from src.screening.technical_indicators import TechnicalAnalyzer
 from src.screening.breakout_filter import BreakoutFilter, FilterCriteria
@@ -257,13 +259,13 @@ class RealDataPatternLabeler:
         pattern_id, confidence = best_pattern
         
         # If confidence too low, label as no_pattern
-        if confidence < 0.5:
+        if confidence < 0.4:  # Balanced threshold for quality patterns
             return 0, 1.0  # no_pattern with high confidence
             
         return pattern_id, confidence
 
 
-def collect_sp500_data(limit=50):
+def collect_sp500_data(limit=100):
     """Collect and filter S&P 500 stocks using all available components."""
     print("="*60)
     print("Collecting S&P 500 Data")
@@ -283,15 +285,15 @@ def collect_sp500_data(limit=50):
     
     print(f"Processing {len(sp500_list)} stocks...")
     
-    # Use BreakoutFilter with normal criteria for balanced filtering
-    criteria = FilterCriteria.normal()
+    # Use BreakoutFilter with loose criteria for more training data
+    criteria = FilterCriteria.loose()
     breakout_filter = BreakoutFilter(data_fetcher=fetcher, criteria=criteria)
     
-    # Analyze stocks
+    # Analyze stocks - increase max_results for more training data
     filtered_results = breakout_filter.analyze_stocks(
         tickers=sp500_list,
         fetch_data=True,
-        max_results=30
+        max_results=100  # Get more stocks for training
     )
     
     # Process results
@@ -428,8 +430,13 @@ def train_on_real_data(images, labels, metadata, epochs=30):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    # Initialize model
+    # Initialize model with correct number of patterns (5: no_pattern, bull_flag, cup_and_handle, head_shoulders, double_bottom)
     recognizer = ChartPatternRecognizer(device=str(device))
+    # Reinitialize model with correct number of classes
+    recognizer.model = PatternCNN(num_patterns=5, input_channels=3).to(device)
+    recognizer.criterion = nn.CrossEntropyLoss()
+    recognizer.optimizer = torch.optim.Adam(recognizer.model.parameters(), lr=0.0005)
+    recognizer.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(recognizer.optimizer, patience=5)
     splitter = DataSplitter()
     
     # Split data
@@ -454,6 +461,8 @@ def train_on_real_data(images, labels, metadata, epochs=30):
     
     # Train model
     print(f"\nTraining for {epochs} epochs...")
+    # Set learning rate before training
+    recognizer.optimizer = torch.optim.Adam(recognizer.model.parameters(), lr=0.0005)
     history = recognizer.train_model(train_loader, val_loader, epochs=epochs, save_best=True)
     
     # Test accuracy
@@ -585,17 +594,17 @@ def main():
     print("5. Backtest on recent data")
     
     # Step 1: Collect S&P 500 data
-    stock_data = collect_sp500_data(limit=30)  # Start with 30 stocks for faster training
+    stock_data = collect_sp500_data(limit=200)  # Use more stocks for better accuracy
     
-    # Step 2: Create labeled dataset
-    images, labels, metadata = create_labeled_dataset(stock_data, window_size=60, stride=20)
+    # Step 2: Create labeled dataset with smaller stride for more samples
+    images, labels, metadata = create_labeled_dataset(stock_data, window_size=60, stride=10)  # Reduced stride from 20 to 10
     
     if len(images) < 100:
         print("\n⚠️  Not enough training data. Try increasing the number of stocks or adjusting filters.")
         return
     
-    # Step 3: Train model
-    recognizer, accuracy = train_on_real_data(images, labels, metadata, epochs=20)
+    # Step 3: Train model with more epochs for better accuracy
+    recognizer, accuracy = train_on_real_data(images, labels, metadata, epochs=50)
     
     # Step 4: Backtest
     backtest_results = backtest_patterns(recognizer)

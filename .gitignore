@@ -16,19 +16,130 @@ dist/
 .env
 .venv/
 venv/
+env/
+ENV/
 
 # VS Code / IDE settings
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Jupyter
 *.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Documentation files (keep only essential ones)
 IMPLEMENTATION.md
 ISSUES.md
 GITHUB_ISSUES.md
 IMPLEMENTATION_GUIDE.md
 environment.yml
+
+# ==========================================
+# PROJECT SPECIFIC - LARGE FILES & CACHES
+# ==========================================
+
+# Data directories (these can be huge!)
+data/cache/
+data/raw/
+data/processed/
+data/models/
+data/reports/
+data/logs/
+data/backtest/
+
+# Cached price data (pickle files are large)
+*.pkl
+*.pickle
+
+# Model files (can be 100MB+)
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.ckpt
+best_pattern_model.pth
+real_data_pattern_model.pth
+
+# Dataset files
+*.csv
+*.json
+!config/*.json  # Keep config JSON files
+*.parquet
+*.feather
+
+# Log files
+*.log
+logs/
+*.txt
+!requirements.txt  # Keep requirements.txt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Test outputs
+test_*.py
+!tests/test_*.py  # Keep actual test files
+run_*.py
+run_*.bat
+
+# Examples folder (if you deleted it)
+examples/
+
+# Large notebooks (keep notebook directory but not outputs)
+notebooks/*.html
+notebooks/*.pdf
+
+# API Keys and secrets
+.env
+*.env
+secrets.yaml
+secrets.json
+api_keys.txt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+backup/
+*.backup
+
+# Output files
+output/
+outputs/
+results/
+
+# Cache directories from specific libraries
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# MacOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows specific  
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux specific
+*~
+.directory
+.Trash-*
